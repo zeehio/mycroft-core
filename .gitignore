@@ -11,4 +11,4 @@ tornado.web
 tornado.ioloop
 mycroft/__version__.py
 MANIFEST.in
-setup.py
+#setup.py
