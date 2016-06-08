@@ -19,7 +19,7 @@ pyowm==2.2.1
 wolframalpha==1.4
 futures==3.0.3
 requests-futures==0.9.5
-astral==latest
+astral
 tzlocal==1.2
 parsedatetime==1.5
 pdoc==0.3.2
