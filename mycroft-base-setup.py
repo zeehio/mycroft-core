@@ -17,7 +17,7 @@ setup(
     install_requires=required('requirements.txt'),
     packages=find_all_packages("mycroft"),
     include_package_data=True,
-
+    dependency_links = ['https://github.com/MycroftAI/adapt/archive/v0.2.0.tar.gz'],
     entry_points={
         'console_scripts': [
             'mycroft-speech-client=mycroft.client.speech.main:main',
