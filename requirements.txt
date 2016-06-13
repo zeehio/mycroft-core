@@ -31,6 +31,4 @@ netifaces==0.10.4
 pyjokes==0.5.0
 psutil==4.1.0
 pep8==1.7.0
-adapt-parser==0.2.1
---extra-index-url=https://pypi.mycroft.team
-
+adapt-parser==0.2.2
