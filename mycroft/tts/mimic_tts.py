@@ -29,7 +29,7 @@ config = ConfigurationManager.get().get("tts", {})
 
 NAME = 'mimic'
 BIN = config.get(
-    "mimic.path", join(MYCROFT_ROOT_PATH, 'mimic', 'bin', 'mimic'))
+    "mimic.path", join('/snap', 'bin', 'mycroft-core.mimic'))
 
 
 class Mimic(TTS):
