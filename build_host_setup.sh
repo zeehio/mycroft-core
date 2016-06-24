@@ -4,6 +4,7 @@ sudo apt-get install -y \
     git \
     python \
     python-dev \
+    python-pip \
     python-setuptools \
     python-virtualenv \
     python-gobject-dev \
@@ -18,7 +19,8 @@ sudo apt-get install -y \
     s3cmd \
     portaudio19-dev \
     mpg123 \
+    screen \
     curl
 
 # upgrade virtualenv to latest from pypi
-sudo easy_install --upgrade virtualenv
+sudo pip install --upgrade virtualenv

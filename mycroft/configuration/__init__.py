@@ -31,9 +31,7 @@ logger = getLogger(__name__)
 
 DEFAULT_CONFIG = join(dirname(__file__), 'mycroft.ini')
 SYSTEM_CONFIG = '/etc/mycroft/mycroft.ini'
-USER_DIR = join(expanduser('~'), '.mycroft')
-USER_CONFIG = join(USER_DIR, 'mycroft.ini')
-USER_THIRD_PARTY_SKILLS_DIR = join(USER_DIR, "third_party_skills")
+USER_CONFIG = join(expanduser('~'), '.mycroft/mycroft.ini')
 
 
 class ConfigurationLoader(object):
@@ -48,9 +46,11 @@ class ConfigurationLoader(object):
         return config
 
     @staticmethod
-    def init_locations(locations=None):
+    def init_locations(locations=None, keep_user_config=True):
         if not locations:
-            return [DEFAULT_CONFIG, SYSTEM_CONFIG, USER_CONFIG]
+            locations = [DEFAULT_CONFIG, SYSTEM_CONFIG, USER_CONFIG]
+        elif keep_user_config:
+            locations += [USER_CONFIG]
         return locations
 
     @staticmethod
@@ -62,12 +62,13 @@ class ConfigurationLoader(object):
             raise TypeError
 
     @staticmethod
-    def load(config=None, locations=None):
+    def load(config=None, locations=None, keep_user_config=True):
         """
         Loads default or specified configuration files
         """
         config = ConfigurationLoader.init_config(config)
-        locations = ConfigurationLoader.init_locations(locations)
+        locations = ConfigurationLoader.init_locations(locations,
+                                                       keep_user_config)
         ConfigurationLoader.validate_data(config, locations)
 
         for location in locations:
@@ -167,8 +168,9 @@ class ConfigurationManager(object):
         return RemoteConfiguration.load(ConfigurationManager.__config)
 
     @staticmethod
-    def load_local(locations=None):
-        return ConfigurationLoader.load(ConfigurationManager.get(), locations)
+    def load_local(locations=None, keep_user_config=True):
+        return ConfigurationLoader.load(ConfigurationManager.get(), locations,
+                                        keep_user_config)
 
     @staticmethod
     def load_remote():

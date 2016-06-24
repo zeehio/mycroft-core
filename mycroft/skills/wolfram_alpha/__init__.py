@@ -115,17 +115,23 @@ class WolframAlphaSkill(MycroftSkill):
             return result
         except:
             try:
-                result = self.__find_value(res.pods, 'Value')
+                result = self.__find_pod_id(res.pods, 'Value')
                 if not result:
-                    result = self.__find_value(
+                    result = self.__find_pod_id(
                         res.pods, 'NotableFacts:PeopleData')
                     if not result:
-                        result = self.__find_value(
+                        result = self.__find_pod_id(
                             res.pods, 'BasicInformation:PeopleData')
                         if not result:
-                            result = self.__find_value(
-                                res.pods, 'DecimalApproximation')
-                            result = result[:5]
+                            result = self.__find_pod_id(res.pods, 'Definition')
+                            if not result:
+                                result = self.__find_pod_id(
+                                    res.pods, 'DecimalApproximation')
+                                if result:
+                                    result = result[:5]
+                                else:
+                                    result = self.__find_num(
+                                        res.pods, '200')
                 return result
             except:
                 return result
@@ -159,7 +165,7 @@ class WolframAlphaSkill(MycroftSkill):
             return
 
         if result:
-            input_interpretation = self.__find_value(res.pods, 'Input')
+            input_interpretation = self.__find_pod_id(res.pods, 'Input')
             verb = "is"
             structured_syntax_regex = re.compile(".*(\||\[|\\\\|\]).*")
             if parsed_question:
@@ -171,7 +177,9 @@ class WolframAlphaSkill(MycroftSkill):
             if "|" in result:  # Assuming "|" indicates a list of items
                 verb = ":"
 
-            result = self.__process_wolfram_string(result)
+            result = self.process_wolfram_string(result)
+            input_interpretation = \
+                self.process_wolfram_string(input_interpretation)
             response = "%s %s %s" % (input_interpretation, verb, result)
 
             self.speak(response)
@@ -179,20 +187,33 @@ class WolframAlphaSkill(MycroftSkill):
             self.speak("Sorry, I don't understand your request.")
 
     @staticmethod
-    def __find_value(pods, pod_id):
+    def __find_pod_id(pods, pod_id):
         for pod in pods:
-            if pod.id == pod_id:
+            if pod_id in pod.id:
                 return pod.text
         return None
 
     @staticmethod
-    def __process_wolfram_string(text):
+    def process_wolfram_string(text):
         # Remove extra whitespace
         text = re.sub(r" \s+", r" ", text)
 
         # Convert | symbols to commas
         text = re.sub(r" \| ", r", ", text)
+
+        # Convert newlines to commas
+        text = re.sub(r"\n", r", ", text)
+
+        # Convert !s to factorial
+        text = re.sub(r"!", r",factorial", text)
         return text
+
+    @staticmethod
+    def __find_num(pods, pod_num):
+        for pod in pods:
+            if pod.node.attrib['position'] == pod_num:
+                return pod.text
+        return None
 
     def stop(self):
         pass
