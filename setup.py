@@ -16,13 +16,14 @@ setup(
     version=get_version(),
     dependency_links = ['https://github.com/MycroftAI/adapt/archive/v0.2.0.tar.gz'],
     
-    adapt=required('v0.2.0.tar.gz'),
+
     install_requires=required('requirements.txt'),
     packages=find_all_packages("mycroft"),
     include_package_data=True,
     entry_points={
         'console_scripts': [
             'mycroft-speech-client=mycroft.client.speech.main:main',
+            'mycroft-cli-client=mycroft.client.cli.main:main',
             'mycroft-messagebus=mycroft.messagebus.service.main:main',
             'mycroft-skills=mycroft.skills.main:main',
             'mycroft-echo-observer=mycroft.messagebus.client.ws:echo',
