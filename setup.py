@@ -23,7 +23,7 @@ setup(
     entry_points={
         'console_scripts': [
             'mycroft-speech-client=mycroft.client.speech.main:main',
-            'mycroft-cli-client=mycroft.client.text:cli',
+            'mycroft-cli-client=mycroft.client.text.cli:main',
             'mycroft-messagebus=mycroft.messagebus.service.main:main',
             'mycroft-skills=mycroft.skills.main:main',
             'mycroft-echo-observer=mycroft.messagebus.client.ws:echo',
