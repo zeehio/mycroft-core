@@ -1,13 +1,62 @@
-mycroft-core (0.7.5ubuntu1~1.gbp778426) UNRELEASED; urgency=medium
+mycroft-core (0.7.5ubuntu1~2.gbp6044b8) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @7784262b72ce4a554b69d82cf7b03ce7746290db **
+  ** SNAPSHOT build @6044b842fdb48dbb5c433c8179e06179a0a7ce28 **
 
   [ Ethan Ward ]
   * Add more deb files
 
   [ Mycroft Devs ]
 
- -- Mycroft Devs <devops@mycroft.ai>  Thu, 14 Jul 2016 09:52:53 -0500
+  [ Matthew D. Scholefield ]
+  * Removed the 'I am searching for' message from Wolfram (Fixes #193) (#206)
+  * Added new compiled regex for "what's" in wolfram - Fixes #159 (#235)
+
+  [ Ethan Ward ]
+  * Issues 108 - Change regex to be localized (#222)
+
+  [ Åke ]
+  * Make skill directory a positional argument (#248)
+
+  [ Matthew D. Scholefield ]
+  * Decreased false positives (Fixes #200) (#202)
+  * Added more tests to EnglishQuestionParser (#251)
+  * Decreased "wake up" false positives - Fixes #189 (#252)
+  * Added false positive audio accuracy test - Fixes #237 (#249)
+
+  [ isaacnward ]
+  * Features/mouth stocks (#261)
+
+  [ Arron Atchison ]
+  * removed Alan's voice from mycroft core in preperation for a mimic release with the precompiled voice (#269)
+
+  [ Matthew D. Scholefield ]
+  * Add new listener config options- Fixes #260 (#266)
+
+  [ Ethan Ward ]
+  * Revert "Feature/use compiled ap voice" (#270)
+
+  [ Åke ]
+  * Add media base class (#267)
+
+  [ Ethan Ward ]
+  * Issues 274 - Add base media skill to blacklisted skills (#275)
+  * Update load_data_files to load regex files (Fixes #256) (#271)
+
+  [ isaacnward ]
+  * Issues/234: Weather display on faceplate (#255)
+
+  [ Ethan Ward ]
+  * Add debian folder
+  * Roll changelog back a version
+  * Add additional deb files
+  * Add more deb files
+  * Update changelog
+  * Update changelog
+  * More deb files
+
+  [ Mycroft Devs ]
+
+ -- Mycroft Devs <devops@mycroft.ai>  Thu, 14 Jul 2016 09:56:44 -0500
 
 mycroft-core (0.7.5) unstable; urgency=low
 

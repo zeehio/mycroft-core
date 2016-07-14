@@ -1,5 +1,5 @@
 Package: mycroft-core
-Version: 0.7.5ubuntu1~1.gbp778426
+Version: 0.7.5ubuntu1~2.gbp6044b8
 Architecture: amd64
 Maintainer: Arron Atchison <arron.atchison@mycroft.ai>
 Installed-Size: 13
