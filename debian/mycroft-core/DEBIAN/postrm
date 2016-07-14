@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+if [ "$1" = purge ]; then
+    if [ -e /home/mycroft ]; then
+       deluser mycroft input
+       deluser mycroft audio
+       deluser mycroft dialout
+       userdel mycroft
+       rm -R /home/mycroft
+    fi
+fi
