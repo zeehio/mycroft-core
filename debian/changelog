@@ -1,0 +1,5 @@
+mycroft-core (0.7.7) unstable; urgency=low
+
+  * Initial release
+
+ -- Ethan Ward <ethan.ward@mycroft.ai>  Tue, 12 Jul 2016 14:36:01 -0500
