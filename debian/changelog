@@ -7,7 +7,7 @@ mycroft-core (0.7.5ubuntu1~1.gbp778426) UNRELEASED; urgency=medium
 
   [ Mycroft Devs ]
 
- -- Ethan Ward <ethanandrewward@gmail.com>  Thu, 14 Jul 2016 09:52:53 -0500
+ -- Mycroft Devs <devops@mycroft.ai>  Thu, 14 Jul 2016 09:52:53 -0500
 
 mycroft-core (0.7.5) unstable; urgency=low
 
