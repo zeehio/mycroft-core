@@ -22,6 +22,7 @@ import xml.etree.ElementTree as ET
 
 from mycroft.skills.core import MycroftSkill
 from mycroft.util.log import getLogger
+from mycroft.messagebus.message import Message
 from adapt.intent import IntentBuilder
 
 __author__ = 'eward'
@@ -49,11 +50,13 @@ class StockSkill(MycroftSkill):
             self.emitter.once("recognizer_loop:audio_output_start",
                               self.enclosure.mouth_text(
                                   response['symbol']+": " + response['price']))
-            self.enclosure.activate_mouth_listeners(False)
+            msg = Message('enclosure.mouth.listeners', metadata={'active': False)
+            self.emitter.emit(msg)
             self.speak_dialog("stock.price", data=response)
             time.sleep(12)
-            self.enclosure.activate_mouth_listeners(True)
-            self.enclosure.mouth_reset()
+            msg = Message('enclosure.mouth.listeners', metadata={'active': True)
+            self.emitter.emit(msg)
+            self.emitter.emit(Message("enclosure.mouth.reset"))
 
         except:
             self.speak_dialog("not.found", data={'company': company})
