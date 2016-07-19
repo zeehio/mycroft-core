@@ -140,7 +140,7 @@ class WolframAlphaSkill(MycroftSkill):
                 return result
 
     def handle_fallback(self, message):
-        self.client.emit(Message("enclosure.mouth.think"))
+        self.emitter.emit(Message("enclosure.mouth.think"))
         logger.debug(
             "Could not determine intent, falling back to WolframAlpha Skill!")
         utterance = message.metadata.get('utterance')
