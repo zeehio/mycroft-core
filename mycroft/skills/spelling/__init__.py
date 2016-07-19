@@ -22,6 +22,7 @@ import time
 
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill
+from mycroft.messagebus.message import Message
 
 __author__ = 'seanfitz'
 
@@ -47,11 +48,13 @@ class SpellingSkill(MycroftSkill):
         self.emitter.once("recognizer_loop:audio_output_start",
                           self.enclosure.mouth_text(word))
         spelled_word = ', '.join(word).lower()
-        self.enclosure.activate_mouth_listeners(False)
+        msg = Message('enclosure.mouth.listeners', metadata={'active': False})
+        self.emitter.emit(msg)
         self.speak(spelled_word)
         time.sleep((self.LETTERS_PER_SCREEN + len(word)) * self.SEC_PER_LETTER)
-        self.enclosure.activate_mouth_listeners(True)
-        self.enclosure.mouth_reset()
+        msg = Message('enclosure.mouth.listeners', metadata={'active': False})
+        self.emitter.emit(msg)
+        self.emitter.emit(Message("enclosure.mouth.reset"))
 
     def stop(self):
         pass

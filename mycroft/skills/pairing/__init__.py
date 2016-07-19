@@ -51,14 +51,15 @@ class PairingSkill(MycroftSkill):
 
     def __display_pairing_code(self, event=None):
         if self.client.paired:
-            self.enclosure.mouth_talk()
+            self.client.emit(Message("enclosure.mouth.talk"))
             self.client = None
             self.__emit_paired(True)
             self.emitter.remove("recognizer_loop:audio_output_start",
                                 self.__display_pairing_code)
         elif not self.displaying:
             self.displaying = True
-            self.enclosure.mouth_text(self.client.pairing_code)
+            self.client.emit(
+                Message("enclosure.mouth.text", metadata={'text': self.client.pairing_code}))
 
     def __emit_paired(self, paired):
         msg = Message('mycroft.paired', metadata={'paired': paired})

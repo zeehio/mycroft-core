@@ -27,6 +27,7 @@ from mycroft.identity import IdentityManager
 from mycroft.skills.core import MycroftSkill
 from mycroft.skills.weather.owm_repackaged import OWM
 from mycroft.util.log import getLogger
+from mycroft.messagebus.message import Message
 
 __author__ = 'jdorleans'
 
@@ -83,12 +84,16 @@ class WeatherSkill(MycroftSkill):
             weather_code = str(weather.get_weather_icon_name())
             img_code = self.CODES[weather_code]
             temp = data['temp_current']
-            self.enclosure.activate_mouth_listeners(False)
-            self.enclosure.weather_display(img_code, temp)
+            msg = Message('enclosure.mouth.listeners', metadata={'active': False})
+            self.emitter.emit(msg)
+            self.client.emit(
+                Message("enclosure.weather.display", metadata={
+                    'img_code': img_code, 'temp': temp}))
             self.speak_dialog('current.weather', data)
             self.__condition_feedback(weather)
             time.sleep(5)
-            self.enclosure.activate_mouth_listeners(True)
+            msg = Message('enclosure.mouth.listeners', metadata={'active': True})
+            self.emitter.emit(msg)
         except APICallError as e:
             self.__api_error(e)
         except Exception as e:
@@ -112,12 +117,16 @@ class WeatherSkill(MycroftSkill):
             weather_code = str(weather.get_weather_icon_name())
             img_code = self.CODES[weather_code]
             temp = data['temp_current']
-            self.enclosure.activate_mouth_listeners(False)
-            self.enclosure.weather_display(img_code, temp)
+            msg = Message('enclosure.mouth.listeners', metadata={'active': False})
+            self.emitter.emit(msg)
+            self.client.emit(
+                Message("enclosure.weather.display", metadata={
+                    'img_code': img_code, 'temp': temp}))
             self.speak_dialog('hour.weather', data)
             self.__condition_feedback(weather)
             time.sleep(5)
-            self.enclosure.activate_mouth_listeners(True)
+            msg = Message('enclosure.mouth.listeners', metadata={'active': True})
+            self.emitter.emit(msg)
         except APICallError as e:
             self.__api_error(e)
         except Exception as e:
@@ -133,12 +142,16 @@ class WeatherSkill(MycroftSkill):
             weather_code = str(weather.get_weather_icon_name())
             img_code = self.CODES[weather_code]
             temp = data['temp_current']
-            self.enclosure.activate_mouth_listeners(False)
-            self.enclosure.weather_display(img_code, temp)
+            msg = Message('enclosure.mouth.listeners', metadata={'active': False})
+            self.emitter.emit(msg)
+            self.client.emit(
+                Message("enclosure.weather.display", metadata={
+                    'img_code': img_code, 'temp': temp}))
             self.speak_dialog('tomorrow.weather', data)
             self.__condition_feedback(weather)
             time.sleep(5)
-            self.enclosure.activate_mouth_listeners(True)
+            msg = Message('enclosure.mouth.listeners', metadata={'active': True})
+            self.emitter.emit(msg)
         except APICallError as e:
             self.__api_error(e)
         except Exception as e:
