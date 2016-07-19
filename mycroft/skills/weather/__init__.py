@@ -86,7 +86,7 @@ class WeatherSkill(MycroftSkill):
             temp = data['temp_current']
             msg = Message('enclosure.mouth.listeners', metadata={'active': False})
             self.emitter.emit(msg)
-            self.client.emit(
+            self.emitter.emit(
                 Message("enclosure.weather.display", metadata={
                     'img_code': img_code, 'temp': temp}))
             self.speak_dialog('current.weather', data)
@@ -119,7 +119,7 @@ class WeatherSkill(MycroftSkill):
             temp = data['temp_current']
             msg = Message('enclosure.mouth.listeners', metadata={'active': False})
             self.emitter.emit(msg)
-            self.client.emit(
+            self.emitter.emit(
                 Message("enclosure.weather.display", metadata={
                     'img_code': img_code, 'temp': temp}))
             self.speak_dialog('hour.weather', data)
