@@ -19,7 +19,8 @@
 import time
 
 import os
-from pocketsphinx.pocketsphinx import Decoder
+from pocketsphinx import Decoder
+import tempfile
 
 __author__ = 'seanfitz, jdorleans'
 
@@ -27,24 +28,36 @@ BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class LocalRecognizer(object):
-    def __init__(self, sample_rate=16000, lang="en-us", key_phrase="mycroft"):
+    def __init__(self, key_phrase, phonemes, threshold, sample_rate=16000,
+                 lang="en-us"):
         self.lang = lang
         self.key_phrase = key_phrase
         self.sample_rate = sample_rate
-        self.configure()
+        self.threshold = threshold
+        self.phonemes = phonemes
+        dict_name = self.create_dict(key_phrase, phonemes)
+        self.decoder = Decoder(self.create_config(dict_name))
 
-    def configure(self):
+    def create_dict(self, key_phrase, phonemes):
+        (fd, file_name) = tempfile.mkstemp()
+        words = key_phrase.split()
+        phoneme_groups = phonemes.split('.')
+        with os.fdopen(fd, 'w') as f:
+            for word, phoneme in zip(words, phoneme_groups):
+                f.write(word + ' ' + phoneme + '\n')
+        return file_name
+
+    def create_config(self, dict_name):
         config = Decoder.default_config()
         config.set_string('-hmm', os.path.join(BASEDIR, 'model', self.lang,
                                                'hmm'))
-        config.set_string('-dict', os.path.join(BASEDIR, 'model', self.lang,
-                                                'mycroft-en-us.dict'))
+        config.set_string('-dict', dict_name)
         config.set_string('-keyphrase', self.key_phrase)
-        config.set_float('-kws_threshold', float('1e-45'))
+        config.set_float('-kws_threshold', float(self.threshold))
         config.set_float('-samprate', self.sample_rate)
         config.set_int('-nfft', 2048)
         config.set_string('-logfn', '/dev/null')
-        self.decoder = Decoder(config)
+        return config
 
     def transcribe(self, byte_data, metrics=None):
         start = time.time()

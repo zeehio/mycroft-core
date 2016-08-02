@@ -16,6 +16,7 @@
 # along with Mycroft Core.  If not, see <http://www.gnu.org/licenses/>.
 
 from os.path import dirname
+import time
 import requests
 import xml.etree.ElementTree as ET
 
@@ -34,9 +35,6 @@ class StockSkill(MycroftSkill):
     def initialize(self):
         self.load_data_files(dirname(__file__))
 
-        self.register_regex("price of (?P<Company>.*)")
-        self.register_regex("is (?P<Company>.*) trading at")
-
         stock_price_intent = IntentBuilder("StockPriceIntent")\
             .require("StockPriceKeyword")\
             .require("Company")\
@@ -48,7 +46,15 @@ class StockSkill(MycroftSkill):
         company = message.metadata.get("Company")
         try:
             response = self.find_and_query(company)
+            self.emitter.once("recognizer_loop:audio_output_start",
+                              self.enclosure.mouth_text(
+                                  response['symbol']+": " + response['price']))
+            self.enclosure.activate_mouth_listeners(False)
             self.speak_dialog("stock.price", data=response)
+            time.sleep(12)
+            self.enclosure.activate_mouth_listeners(True)
+            self.enclosure.mouth_reset()
+
         except:
             self.speak_dialog("not.found", data={'company': company})
 

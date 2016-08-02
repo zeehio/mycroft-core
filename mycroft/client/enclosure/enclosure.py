@@ -14,24 +14,31 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Mycroft Core.  If not, see <http://www.gnu.org/licenses/>.
-
-
+import subprocess
 import sys
 from Queue import Queue
+from alsaaudio import Mixer
 from threading import Thread
 
+import os
 import serial
+import time
+
+import threading
 
 from mycroft.client.enclosure.arduino import EnclosureArduino
 from mycroft.client.enclosure.eyes import EnclosureEyes
 from mycroft.client.enclosure.mouth import EnclosureMouth
+from mycroft.client.enclosure.weather import EnclosureWeather
 from mycroft.configuration import ConfigurationManager
 from mycroft.messagebus.client.ws import WebsocketClient
 from mycroft.messagebus.message import Message
-from mycroft.util import kill
+from mycroft.util import kill, str2bool
+from mycroft.util import play_wav
 from mycroft.util.log import getLogger
+from mycroft.util.audio_test import record
 
-__author__ = 'aatchison + jdorleans'
+__author__ = 'aatchison + jdorleans + iward'
 
 LOGGER = getLogger("EnclosureClient")
 
@@ -70,15 +77,40 @@ class EnclosureReader(Thread):
                 LOGGER.error("Reading error: {0}".format(e))
 
     def process(self, data):
+        self.client.emit(Message(data))
+
         if "mycroft.stop" in data:
             self.client.emit(Message("mycroft.stop"))
-            kill(['mimic'])  # TODO - Refactoring in favor of Mycroft Stop
 
         if "volume.up" in data:
-            self.client.emit(Message("IncreaseVolumeIntent"))
+            self.client.emit(
+                Message("IncreaseVolumeIntent", metadata={'play_sound': True}))
 
         if "volume.down" in data:
-            self.client.emit(Message("DecreaseVolumeIntent"))
+            self.client.emit(
+                Message("DecreaseVolumeIntent", metadata={'play_sound': True}))
+
+        if "system.test.begin" in data:
+            self.client.emit(Message('recognizer_loop:sleep'))
+
+        if "system.test.end" in data:
+            self.client.emit(Message('recognizer_loop:wake_up'))
+
+        if "mic.test" in data:
+            mixer = Mixer()
+            prev_vol = mixer.getvolume()[0]
+            mixer.setvolume(35)
+            self.client.emit(Message("speak", metadata={
+                'utterance': "I am testing one two three"}))
+
+            time.sleep(0.5)  # Prevents recording the loud button press
+            record("/tmp/test.wav", 3.0)
+            mixer.setvolume(prev_vol)
+            play_wav("/tmp/test.wav")
+            time.sleep(3.5)  # Pause between tests so it's not so fast
+
+            # Test audio muting on arduino
+            subprocess.call('speaker-test -P 10 -l 0 -s 1', shell=True)
 
     def stop(self):
         self.alive = False
@@ -150,7 +182,38 @@ class Enclosure:
         self.eyes = EnclosureEyes(self.client, self.writer)
         self.mouth = EnclosureMouth(self.client, self.writer)
         self.system = EnclosureArduino(self.client, self.writer)
+        self.weather = EnclosureWeather(self.client, self.writer)
         self.__register_events()
+
+    def setup(self):
+        must_upload = self.config.get('must_upload')
+        if must_upload is not None and str2bool(must_upload):
+            ConfigurationManager.set('enclosure', 'must_upload', False)
+            time.sleep(5)
+            self.client.emit(Message("speak", metadata={
+                'utterance': "I am currently uploading to the arduino."}))
+            self.client.emit(Message("speak", metadata={
+                'utterance': "I will be finished in just a moment."}))
+            self.upload_hex()
+            self.client.emit(Message("speak", metadata={
+                'utterance': "Arduino programing complete."}))
+
+        must_start_test = self.config.get('must_start_test')
+        if must_start_test is not None and str2bool(must_start_test):
+            ConfigurationManager.set('enclosure', 'must_start_test', False)
+            time.sleep(0.5)  # Ensure arduino has booted
+            self.client.emit(Message("speak", metadata={
+                'utterance': "Begining hardware self test."}))
+            self.writer.write("test.begin")
+
+    @staticmethod
+    def upload_hex():
+        old_path = os.getcwd()
+        try:
+            os.chdir('/opt/enclosure/')
+            subprocess.check_call('./upload.sh')
+        finally:
+            os.chdir(old_path)
 
     def __init_serial(self):
         try:
@@ -217,7 +280,13 @@ class Enclosure:
 
 def main():
     try:
-        Enclosure().run()
+        enclosure = Enclosure()
+        t = threading.Thread(target=enclosure.run)
+        t.start()
+        enclosure.setup()
+        t.join()
+    except Exception as e:
+        print(e)
     finally:
         sys.exit()
 

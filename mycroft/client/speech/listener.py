@@ -38,6 +38,7 @@ logger = getLogger(__name__)
 
 core_config = ConfigurationManager.get().get('core')
 speech_config = ConfigurationManager.get().get('speech_client')
+listener_config = ConfigurationManager.get().get('listener')
 
 
 class AudioProducer(threading.Thread):
@@ -199,20 +200,31 @@ class RecognizerLoopState(object):
 
 class RecognizerLoop(pyee.EventEmitter):
     def __init__(self, channels=int(speech_config.get('channels')),
-                 sample_rate=int(speech_config.get('sample_rate')),
+                 rate=int(speech_config.get('sample_rate')),
                  device_index=None,
                  lang=core_config.get('lang')):
         pyee.EventEmitter.__init__(self)
-        self.microphone = MutableMicrophone(sample_rate=sample_rate,
+        self.microphone = MutableMicrophone(sample_rate=rate,
                                             device_index=device_index)
 
         # FIXME - channels are not been used
         self.microphone.CHANNELS = channels
-        self.mycroft_recognizer = LocalRecognizer(sample_rate, lang)
+        self.mycroft_recognizer = self.create_mycroft_recognizer(rate, lang)
         # TODO - localization
-        self.wakeup_recognizer = LocalRecognizer(sample_rate, lang, "wake up")
+        self.wakeup_recognizer = self.create_wakeup_recognizer(rate, lang)
         self.remote_recognizer = ResponsiveRecognizer(self.mycroft_recognizer)
         self.state = RecognizerLoopState()
+
+    @staticmethod
+    def create_mycroft_recognizer(rate, lang):
+        wake_word = listener_config.get('wake_word')
+        phonemes = listener_config.get('phonemes')
+        threshold = listener_config.get('threshold')
+        return LocalRecognizer(wake_word, phonemes, threshold, rate, lang)
+
+    @staticmethod
+    def create_wakeup_recognizer(rate, lang):
+        return LocalRecognizer("wake up", "W EY K . AH P", "1e-10", rate, lang)
 
     def start_async(self):
         self.state.running = True
