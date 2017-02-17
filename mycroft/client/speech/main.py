@@ -20,7 +20,7 @@ import re
 import sys
 from threading import Thread, Lock
 
-from mycroft.client.enclosure.api import EnclosureAPI
+# from mycroft.client.enclosure.api import EnclosureAPI
 from mycroft.client.speech.listener import RecognizerLoop
 from mycroft.configuration import ConfigurationManager
 from mycroft.identity import IdentityManager
@@ -126,7 +126,8 @@ def handle_paired(event):
 
 def handle_open():
     # Reset the UI to indicate ready for speech processing
-    EnclosureAPI(ws).reset()
+    #EnclosureAPI(ws).reset()
+    pass
 
 
 def connect():

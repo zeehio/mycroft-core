@@ -18,7 +18,7 @@ import random
 from abc import ABCMeta, abstractmethod
 from os.path import dirname, exists, isdir
 
-from mycroft.client.enclosure.api import EnclosureAPI
+#from mycroft.client.enclosure.api import EnclosureAPI
 from mycroft.configuration import ConfigurationManager
 from mycroft.messagebus.client.ws import WebsocketClient
 from mycroft.util.log import getLogger
@@ -47,7 +47,7 @@ class TTS(object):
 
     def init(self, ws):
         self.ws = ws
-        self.enclosure = EnclosureAPI(self.ws)
+        #self.enclosure = EnclosureAPI(self.ws)
 
     @abstractmethod
     def execute(self, sentence):
@@ -55,7 +55,8 @@ class TTS(object):
 
     def blink(self, rate=1.0):
         if random.random() < rate:
-            self.enclosure.eyes_blink("b")
+            pass
+            #self.enclosure.eyes_blink("b")
 
 
 class TTSValidator(object):
