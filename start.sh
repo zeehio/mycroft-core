@@ -2,7 +2,7 @@
 TOP=$(cd $(dirname $0) && pwd -L)
 VIRTUALENV_ROOT=${VIRTUALENV_ROOT:-"${HOME}/.virtualenvs/mycroft"}
 
-case $1 in
+case ${1} in
 	"service") SCRIPT=${TOP}/mycroft/messagebus/service/main.py ;;
 	"skills") SCRIPT=${TOP}/mycroft/skills/main.py ;;
 	"skill_container") SCRIPT=${TOP}/mycroft/skills/container.py ;;
@@ -18,9 +18,11 @@ case $1 in
 	*) echo "Usage: start.sh [service | skills | skill_container | voice | cli | audiotest | collector | unittest | enclosure | sdkdoc | wifi]"; exit ;;
 esac
 
+SCRIPT_NAME=${1}
+
 echo "Starting $@"
 
 shift
 
 source ${VIRTUALENV_ROOT}/bin/activate
-PYTHONPATH=${TOP} python ${SCRIPT} $@
+PYTHONPATH=${TOP} strace -o debug/strace/${SCRIPT_NAME}.out -f python ${SCRIPT} $@
